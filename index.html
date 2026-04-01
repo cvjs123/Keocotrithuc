@@ -1,0 +1,540 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kéo Co Trí Tuệ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Press+Start+2P&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(180deg, #0a1f3d 0%, #1a3a5c 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        .score-left,
+        .score-right,
+        .score-box {
+            text-align: center;
+        }
+
+        .score-left, .score-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .score-left .team-name,
+        .score-right .team-name,
+        .score-box .team-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .score-blue { color: #00d4ff; font-size: 2.8rem; text-shadow: 0 0 15px #00d4ff; }
+        .score-red { color: #ff3b3b; font-size: 2.8rem; text-shadow: 0 0 15px #ff3b3b; }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        header {
+            background: rgba(0,0,0,0.5);
+            padding: 15px 30px;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 20px;
+            z-index: 100;
+            text-align: center;
+        }
+
+        .score-left, .score-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .title {
+            justify-self: center;
+            font-family: 'Press Start 2P', sans-serif;
+            font-size: 2.4rem;
+            background: linear-gradient(90deg, #00d4ff, #ff3b3b);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 320px 1fr 320px;
+            gap: 10px;
+            padding: 15px;
+        }
+
+        /* === ĐỘI XANH === */
+        .team-left {
+            background: linear-gradient(180deg, #003366, #0066cc);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .team-left .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .team-left .header h2 { color: #00d4ff; }
+
+        /* === KHU VỰC KÉO CO Ở GIỮA === */
+        .center-area {
+            background: #0f2a1f;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .tug-zone {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .rope-container {
+            width: 95%;
+            max-width: 3920px; /* gấp 4 lần so với 980px */
+            height: 1040px; /* gấp 4 lần so với 260px */
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tug-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            user-select: none;
+            -webkit-user-drag: none;
+            pointer-events: none;
+            filter: drop-shadow(0 18px 18px rgba(0,0,0,0.45));
+            transition: transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .center-marker {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+            width: 0;
+            height: 100%;
+            border-left: 4px dashed #ff0000;
+            box-shadow: 0 0 20px #ff0000;
+            z-index: 10;
+            transition: left 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* === CÂU HỎI === */
+        .question-left, .question-right {
+            background: rgba(255,255,255,0.95);
+            color: #222;
+            border-radius: 20px;
+            padding: 25px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-text {
+            font-size: 1.45rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 25px;
+            color: #111;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            flex: 1;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 4px solid #ddd;
+            border-radius: 14px;
+            padding: 16px 20px;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .option:hover { transform: translateX(8px); }
+        .option.correct { border-color: #22c55e; background: #ecfdf5; color: #065f46; }
+        .option.wrong { border-color: #ef4444; background: #fee2e2; color: #b91c1c; }
+        .option.chosen-correct { background: #10b981; color: white; border-color: #059669; }
+        .option.chosen-wrong { background: #ef4444; color: white; border-color: #991b1b; }
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 50;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 50px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="score-left">
+            <div class="team-name" style="color:#00d4ff">ĐỘI XANH</div>
+            <div id="score-blue" class="score-blue">0</div>
+        </div>
+
+        <div class="title">KÉO CO TRÍ TUỆ</div>
+
+        <div class="score-right">
+            <div class="team-name" style="color:#ff3b3b">ĐỘI ĐỎ</div>
+            <div id="score-red" class="score-red">0</div>
+        </div>
+
+        <div class="header-controls">
+            <button onclick="toggleSound()" id="sound-btn" class="btn">🔊 Âm thanh</button>
+            <button onclick="toggleFullscreen()" class="btn">⛶ Toàn màn hình</button>
+            <button onclick="callRandomStudent()" class="btn" style="background:#ffd700;color:#222;font-weight:bold;">🎤 Gọi HS</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Đội Xanh + Câu hỏi trái -->
+        <div class="team-left">
+            <div class="header">
+                <h2>ĐỘI XANH</h2>
+            </div>
+            <div class="question-left" id="question-left">
+                <div class="question-text" id="question-text">Nhấn "Gọi học sinh" hoặc bắt đầu trò chơi...</div>
+                <div class="options" id="options-container"></div>
+            </div>
+        </div>
+
+        <!-- Khu vực kéo co ở giữa -->
+        <div class="center-area">
+            <div class="controls">
+                <button onclick="restartGame()" class="btn">🔁 Chơi lại</button>
+            </div>
+
+            <div id="turn-indicator" style="text-align:center;font-weight:bold;color:#ffd700;padding:8px 0;min-height:24px;">Đội trả lời: Xanh</div>
+
+            <div class="tug-zone">
+                <div class="rope-container">
+                    <img
+                        class="tug-img"
+                        id="tug-img"
+                        src="Media/Images/ChatGPT_Image_21_50_55_28_thg_3__2026-removebg-preview.png"
+                        alt="Minh hoạ trò chơi kéo co"
+                        draggable="false"
+                    />
+                    <div class="center-marker" id="marker"></div>
+                </div>
+            </div>
+
+            <div style="text-align:center;padding:15px;background:rgba(0,0,0,0.4);font-size:1.1rem;">
+                Đúng → Đội của học sinh kéo • Sai → Kéo ngược
+            </div>
+        </div>
+
+        <!-- Đội Đỏ + Câu hỏi phải -->
+        <div class="team-left" style="background: linear-gradient(180deg, #660000, #cc0000);">
+            <div class="header">
+                <h2 style="color:#ff3b3b">ĐỘI ĐỎ</h2>
+            </div>
+            <div class="question-right" id="question-right" style="background:rgba(255,255,255,0.92);">
+                <!-- Câu hỏi sẽ được copy từ bên trái để đồng bộ -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Audio Elements -->
+    <audio id="audio-correct" preload="auto">
+        <source src="Media/Audio/correct.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audio-wrong" preload="auto">
+        <source src="Media/Audio/wrong.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audio-background" preload="auto" loop>
+        <source src="Media/Audio/background.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Dữ liệu câu hỏi Vật lý lớp 6-8
+        let questions = [
+            { q: "Đơn vị đo lực trong hệ SI là gì?", a: ["Mét", "Kilogram", "Newton", "Joule"], c: 2 },
+            { q: "Định luật Hooke nói về mối quan hệ giữa lực và?", a: ["Tốc độ", "Độ giãn của lò xo", "Khối lượng", "Áp suất"], c: 1 },
+            { q: "Lực ma sát có hướng như thế nào so với chuyển động?", a: ["Cùng chiều", "Ngược chiều", "Vuông góc", "Không xác định"], c: 1 },
+            { q: "Đơn vị của công cơ học là?", a: ["Watt", "Newton", "Joule", "Pascal"], c: 2 },
+            { q: "Khi treo vật vào lò xo, lò xo sẽ?", a: ["Co lại", "Giãn ra", "Không đổi", "Rung"], c: 1 }
+        ];
+
+        let blueQuestions = [];
+        let redQuestions = [];
+        let blueIndex = 0;
+        let redIndex = 0;
+        let scoreBlue = 0;
+        let scoreRed = 0;
+        let ropePos = 50; // %
+        let muted = false;
+        let blueAnswered = false;
+        let redAnswered = false;
+        let blueAttempts = 0;
+        let redAttempts = 0;
+        let blueFinishAttempt = null;
+        let redFinishAttempt = null;
+        let quizFinished = false;
+
+        function shuffleArray(arr) {
+            return [...arr].sort(() => Math.random() - 0.5);
+        }
+
+        function updateScoresAndRope(team, isCorrect) {
+            if (!isCorrect) return;
+            if (team === 'blue') {
+                scoreBlue++;
+                ropePos = Math.max(10, ropePos - 10);
+            } else {
+                scoreRed++;
+                ropePos = Math.min(90, ropePos + 10);
+            }
+            document.getElementById('score-blue').textContent = scoreBlue;
+            document.getElementById('score-red').textContent = scoreRed;
+            updateTugImage();
+        }
+
+        function getQuestionHtml(team, idx) {
+            const question = team === 'blue' ? blueQuestions[idx] : redQuestions[idx];
+            if (!question) {
+                return `<div style="font-weight:bold;color:#333;">Đã hoàn thành.</div>`;
+            }
+            return `
+                <div style="color:#666;font-size:1.1rem;margin-bottom:10px;">Câu ${idx + 1}/${questions.length}</div>
+                <div class="question-text">${question.q}</div>
+                <div class="options">
+                    ${question.a.map((ans, i) => `
+                        <div class="option" data-index="${i}">
+                            <strong>${String.fromCharCode(65+i)}.</strong> ${ans}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function checkGameEnd() {
+            if (blueIndex >= questions.length && redIndex >= questions.length) {
+                quizFinished = true;
+                let winnerText;
+                if (scoreBlue > scoreRed) {
+                    winnerText = 'Đội Xanh';
+                } else if (scoreRed > scoreBlue) {
+                    winnerText = 'Đội Đỏ';
+                } else {
+                    // hòa điểm: căn cứ đội hoàn thành nhanh hơn
+                    if (blueFinishAttempt !== null && redFinishAttempt !== null) {
+                        if (blueFinishAttempt < redFinishAttempt) winnerText = 'Đội Xanh';
+                        else if (redFinishAttempt < blueFinishAttempt) winnerText = 'Đội Đỏ';
+                        else winnerText = 'Hai đội hòa nhau';
+                    } else {
+                        winnerText = 'Hai đội hòa nhau';
+                    }
+                }
+
+                setTimeout(() => alert(`🎉 Kết thúc toàn bộ câu hỏi. ${winnerText} thắng!`), 50);
+                return true;
+            }
+            return false;
+        }
+
+        function renderQuestions() {
+            if (checkGameEnd()) return;
+
+            blueAnswered = false;
+            redAnswered = false;
+
+            document.getElementById('question-left').innerHTML = getQuestionHtml('blue', blueIndex);
+            document.getElementById('question-right').innerHTML = getQuestionHtml('red', redIndex);
+
+            // gán sự kiện cho từng bên
+            Array.from(document.querySelectorAll('#question-left .option')).forEach(option => {
+                option.addEventListener('click', (event) => {
+                    if (quizFinished || blueAnswered) return;
+                    handleTeamAnswer('blue', parseInt(option.dataset.index), event.currentTarget);
+                });
+            });
+
+            Array.from(document.querySelectorAll('#question-right .option')).forEach(option => {
+                option.addEventListener('click', (event) => {
+                    if (quizFinished || redAnswered) return;
+                    handleTeamAnswer('red', parseInt(option.dataset.index), event.currentTarget);
+                });
+            });
+        }
+
+        function handleTeamAnswer(team, selected, clickedOptionEl) {
+            const idx = team === 'blue' ? blueIndex : redIndex;
+            const question = team === 'blue' ? blueQuestions[idx] : redQuestions[idx];
+            if (!question) return;
+
+            const isCorrect = selected === question.c;
+            clickedOptionEl.classList.add(isCorrect ? 'chosen-correct' : 'chosen-wrong');
+
+            // Phát âm thanh
+            if (!muted) {
+                if (isCorrect) {
+                    document.getElementById('audio-correct').play().catch(() => {});
+                } else {
+                    document.getElementById('audio-wrong').play().catch(() => {});
+                }
+            }
+
+            // Tăng số lần đã trả lời
+            if (team === 'blue') {
+                blueAttempts++;
+            } else {
+                redAttempts++;
+            }
+
+            // Cộng điểm và kéo dây chỉ khi đúng
+            updateScoresAndRope(team, isCorrect);
+
+            // Chuyển câu tiếp cho đội vừa làm
+            if (team === 'blue') {
+                blueIndex++;
+                blueAnswered = true;
+                if (blueIndex >= questions.length && blueFinishAttempt === null) {
+                    blueFinishAttempt = blueAttempts;
+                }
+            } else {
+                redIndex++;
+                redAnswered = true;
+                if (redIndex >= questions.length && redFinishAttempt === null) {
+                    redFinishAttempt = redAttempts;
+                }
+            }
+
+            // nếu đã trả lời xong cả hai đội thì kiểm tra kết thúc
+            setTimeout(() => {
+                if (checkGameEnd()) return;
+                renderQuestions();
+            }, 400);
+        }
+
+        function restartGame() {
+            scoreBlue = 0;
+            scoreRed = 0;
+            ropePos = 50;
+            blueAnswered = false;
+            redAnswered = false;
+            blueAttempts = 0;
+            redAttempts = 0;
+            blueFinishAttempt = null;
+            redFinishAttempt = null;
+            quizFinished = false;
+            blueIndex = 0;
+            redIndex = 0;
+            blueQuestions = shuffleArray(questions);
+            redQuestions = shuffleArray(questions);
+            document.getElementById('score-blue').textContent = 0;
+            document.getElementById('score-red').textContent = 0;
+            updateTugImage();
+            renderQuestions();
+        }
+
+        // Khởi động
+        window.onload = () => {
+            blueQuestions = shuffleArray(questions);
+            redQuestions = shuffleArray(questions);
+            restartGame();
+            
+            // Phát nhạc nền
+            const bgAudio = document.getElementById('audio-background');
+            bgAudio.volume = 0.3;
+            bgAudio.play().catch(() => {});
+        };
+
+        function callRandomStudent() {
+            alert("🎤 Đang gọi học sinh ngẫu nhiên...\n\n(Tính năng này sẽ mở rộng sau)");
+            // Có thể kết hợp Speech API như phiên bản trước
+        }
+
+        function toggleSound() {
+            muted = !muted;
+            const bgAudio = document.getElementById('audio-background');
+            if (muted) {
+                bgAudio.pause();
+                document.getElementById('sound-btn').textContent = "🔇 Tắt âm";
+            } else {
+                bgAudio.play().catch(() => {});
+                document.getElementById('sound-btn').textContent = "🔊 Âm thanh";
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        }
+
+        function updateTugImage() {
+            const img = document.getElementById('tug-img');
+            const container = img?.parentElement;
+            if (!img || !container) return;
+
+            const maxShift = Math.min(140, container.clientWidth * 0.14);
+            const shift = ((ropePos - 50) / 30) * maxShift; // ropePos ~ [20..80] -> [-maxShift..+maxShift]
+            img.style.transform = `translateX(${shift.toFixed(1)}px)`;
+        }
+
+    </script>
+</body>
+</html>
